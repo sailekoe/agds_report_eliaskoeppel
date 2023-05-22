@@ -9,7 +9,7 @@ In this report exercise, I'm going to discuss the pre-installed dataset "airqual
 
 Ozone (O3) is an air pollutant that is not directly emitted into the air, but instead it is formed through chemical reactions in the atmosphere when ultraviolet (UV) radiation from the sun interacts with nitrogen oxides (NOx = NO2 + NO) and volatile organic compounds (VOCs) (https://airquality.gsfc.nasa.gov/surface-level-ozone). Consequently, I expect that the ozone concentration increases with high temperatures. Given the fact that the ozone formation requires nitrogen oxides, which are  released to the atmosphere through human actions (which mainly happen in the city), I expect that a high wind speed leads to an decrease of the ozone concentration because the air is being exchanged.  
 
-In the first step, I'm going to show three different graphs, which illustrate the relation between the two variables, temperature and wind, and the ozone concentration in the air. Further, I'm going to discuss some statistical metrics. 
+In the first step, I'm going to show three different graphs, which illustrate the relation between the two variables temperature and wind, and the ozone concentration in the air. Further, I'm going to discuss some statistical metrics. 
 
 
 
