@@ -1,0 +1,108 @@
+---
+title: "report_exercise_10"
+author: "Elias Köppel"
+date: "2023-05-20"
+output: html_document
+---
+
+Proceed as follows:
+
+Set aside 20% of the data of each site for testing.
+
+Compare within-site predictions and across-site predictions on the test set for both sites, considering different metrics. For across-site predictions, make sure to implement a train and test setup that enables a true out-of-sample prediction test.
+
+Train a single model with training data pooled from both sites and predict with this single model on the test data of both sites. How do the model metrics on the test set compare to the true out-of-sample setup above?
+Interpret differences. Is it a valid approach to perform model training like this? Use your knowledge about structure in the data and its relevance for the model training setup.
+
+Get information about the characteristics of the two sites. What are the differences in terms of climate, vegetation, altitude, etc. between the Davos and Laegern sites? Interpret biases of the out-of-sample predictions with a view to the site characteristics.
+
+
+
+```{r}
+library(dplyr)
+library(tidyverse)
+source("report_exercise_10_functions.R")
+
+
+
+
+davos_flux <- read_csv("C:/Users/elias/OneDrive/Uni/4. Semester/Geo/AGDS I/agds_report_eliaskoeppel/data/FLX_CH-Dav_FLUXNET2015_FULLSET_DD_1997-2014_1-3.csv")
+
+davos_flux <- get_selection(davos_flux)
+
+
+laegern_flux <- read_csv("C:/Users/elias/OneDrive/Uni/4. Semester/Geo/AGDS I/agds_report_eliaskoeppel/data/FLX_CH-Lae_FLUXNET2015_FULLSET_HH_2004-2006.csv")
+
+laegern_flux <- get_selection_laegern(laegern_flux)
+
+
+set.seed(1982) 
+
+
+#getting splits for davos data
+split1 <- rsample::initial_split(davos_flux, prop = 0.8, strata = "VPD_F")
+  
+davos_flux_train <- rsample::training(split1)
+  
+davos_flux_test <- rsample::testing(split1)
+
+
+#getting splits for laegern data
+split2 <- rsample::initial_split(laegern_flux, prop = 0.8, strata = "VPD_F")
+
+laegern_flux_train <- rsample::training(split2)
+  
+laegern_flux_test <- rsample::testing(split2)
+
+
+# pre-processing with the get_pp function I stored in the extra file
+pp_davos_train <- get_pp(davos_flux_train)
+pp_davos_test <- get_pp(davos_flux_test)
+
+pp_laegern_train <- get_pp(laegern_flux_train)
+pp_laegern_teset <- get_pp(laegern_flux_test)
+
+
+
+
+```
+
+
+
+
+k-fold cross validation for the davos_flux_train data:
+```{r}
+set.seed(1982)
+mod_cv_davos_train <- caret::train(pp_davos_train, 
+                       data = davos_flux_train |> drop_na(), 
+                       method = "knn",
+                       trControl = caret::trainControl(method = "cv", number = 10))
+                       
+
+
+# generic print
+print(mod_)
+
+```
+
+
+
+To answer second task, read in Chapter the following paragraph: 
+"To evaluate model generalisability to a new site or catchment (not just a new time step within a single site or catchment), this structure has to be taken into consideration. In this, case, data splits of training and validation or testing subsets are to be separated along blocks, delineated by the similar groups of data points (by sites, or by catchments). That is, training data from a given site (or catchment) should be either in the training set or in the test (or validation) set, but not in both."
+
+
+
+
+How the cv model of the davos train set performs on the davos test set (within-site)
+```{r}
+eval_model(mod = mod_cv_davos_train, df_train = davos_flux_train, df_test = davos_flux_test)
+```
+
+
+How the cv model of the davos train set performs on the laegern test set (across-site)
+```{r}
+eval_model(mod = mod_cv_davos_train, df_train = davos_flux_train, df_test = laegern_flux_test)
+
+```
+
+

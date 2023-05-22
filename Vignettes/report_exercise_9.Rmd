@@ -1,0 +1,257 @@
+---
+title: "report_exercise_9"
+author: "Elias Köppel"
+date: "2023-05-04"
+output:
+  html_document:
+    toc: true
+---
+
+```{r}
+source("report_exercise_9_functions.R") # to access the functions I saved in a separate file called "report_exercise_9_functions"
+
+
+library(ggplot2)
+library(dplyr)
+library(tidyverse)
+library(rsample)
+library(recipes)
+library(caret)
+library(class)
+library(readr)
+library(lubridate)
+library(tidyr)
+daily_fluxes <- read_csv("C:/Users/elias/OneDrive/Uni/4. Semester/Geo/AGDS I/agds_report_eliaskoeppel/data/FLX_CH-Dav_FLUXNET2015_FULLSET_DD_1997-2014_1-3.csv") 
+
+daily_fluxes <- get_selection(daily_fluxes)
+
+
+
+##use the functions I created in the file report_exercise_9_functions
+
+  # creating the subsets
+  daily_fluxes_train <- get_split(daily_fluxes)$train
+
+  daily_fluxes_test <- get_split(daily_fluxes)$test
+
+  #getting the pre-preocessed data
+  pp <- get_pp(daily_fluxes)
+  
+  # getting the linear model and the knn model
+  lmfit <- get_lm(data = daily_fluxes, pp = pp)
+
+  knnfit <- get_knn(data = daily_fluxes, pp = pp)
+```
+
+```{r}
+  # getting the evaluation of the regression model 
+  eval_model(mod = lmfit, df_train = daily_fluxes_train, df_test = daily_fluxes_test)
+
+
+```
+
+```{r}
+ # getting the evaluation of the knn model 
+eval_model(mod = knnfit, df_train = daily_fluxes_train, df_test = daily_fluxes_test)
+```
+
+2) Interpret observed differences in the context of the bias-variance trade-off:
+
+Why is the difference between the evaluation on the training and the test set larger for the KNN model than for the linear regression model?
+
+    KNN is overfitting. --> high variance. That's the reason why the difference between the training set and the     testing set is bigger than for the linear regression model, which is probably underfitting, but therefore    has a very small variance. 
+
+Why does the evaluation on the test set indicate a better model performance of the KNN model than the linear regression model?
+  
+    The KNN model (compared to the linear regression model) is a non-linear model, which can capture non-linear relationships between the input features and the target variable. So, the fact that the KNN model performs better at the test set than the linear regression model could mean that there is an non-linear relationship between the variables. 
+
+
+How would you position the KNN and the linear regression model along the spectrum of the bias-variance trade-off?
+
+
+    KNN --> small Bias, big variance
+    linear model --> big bias, small variance
+    
+    
+3.) Visualise temporal variations of observed and modelled GPP for both models, covering all available dates   
+    
+    
+
+
+modelled GPP values with the lm model on the train set
+```{r}
+
+#fist I have to get the modelled GPP values (I copied a part of the eval_model function)
+
+df_train_lm <- daily_fluxes_train |> #creating a new data set, which does not contain the NA values
+    drop_na()
+
+df_train_lm$fitted <- predict(lmfit, newdata = df_train_lm) #here a new column for the fitted value is created 
+  
+
+
+  
+```
+  
+  
+  
+modelled GPP values with the KNN model on the train set
+```{r}
+
+#fist I have to get the modelled GPP values (I copied a part of the eval_model function)
+
+df_train_knn <- daily_fluxes_train |> #creating a new data set, which does not contain the NA values
+    drop_na()
+
+df_train_knn$fitted <- predict(knnfit, newdata = df_train_knn) #here a new column for the fitted value is created 
+  
+
+
+  
+```
+
+modelled GPP values with the KNN model on test set
+```{r}
+
+#fist I have to get the modelled GPP values (I copied a part of the eval_model function)
+
+df_test_knn <- daily_fluxes_test |> #creating a new data set, which does not contain the NA values
+    drop_na()
+
+df_test_knn$fitted <- predict(knnfit, newdata = df_test_knn) #here a new column for the fitted value is created 
+  
+
+  
+```
+
+modelled GPP values with the lm model on test set
+```{r}
+
+#fist I have to get the modelled GPP values (I copied a part of the eval_model function)
+
+df_test_lm <- daily_fluxes_test |> #creating a new data set, which does not contain the NA values
+    drop_na()
+
+df_test_lm$fitted <- predict(lmfit, newdata = df_test_lm) #here a new column for the fitted value is created 
+  
+
+  
+```
+
+
+Visualisation:
+```{r}
+ggplot(data = df_train_lm, aes(x = TIMESTAMP, y = fitted)) +
+  geom_point(color = "orange") +
+  geom_point(data = df_test_lm, aes(x = TIMESTAMP, y = fitted), color = "red" ) +
+  geom_point(data = df_train_knn, aes(x = TIMESTAMP, y = fitted), color = "blue") +
+  geom_point(data = df_test_knn, aes(x = TIMESTAMP, y = fitted), color = "black") +
+  geom_point(data = df_train_lm, aes(x = TIMESTAMP, y = GPP_NT_VUT_REF), color = "green") +
+  theme_classic() +
+   scale_color_manual() 
+
+
+
+```
+
+  
+  
+exercise: Let’s look at the role of k in a KNN. Answer the following questions:
+
+Based on your understanding of KNN (and without running code), state a hypothesis for how the R2
+and the MAE evaluated on the test and on the training set would change for k approaching 1 and for k approaching N (the number of observations in the data). Explain your hypothesis, referring to the bias-variance trade-off.
+      
+    If k approaches 1: the model has low bias but higher variance. This is because the model is considering only the nearest neighbor which could result in overfitting. Therefore, I would expect the R2 on the training set to increase while the MAE would decrease. On the test set, however, we could see a decrease in the R2 as the model would not generalize well to new data resulting in higher prediction errors -->  the MAE increases as well.
+
+    If k approaches N: the model has high bias but lower variance. Considering more neighbors should reduce the overfitting to the training data but might result in underfitting if the model is too simple. Therefore, I would expect the R2 on the training set to decrease while the MAE would increase. However, on the test set, I would expect the model to generalize better to new data with lower prediction errors --> the R2  increases and the MAE decreases.
+
+
+Put your hypothesis to the test! Write code that splits the data into a training and a test set and repeats model fitting and evaluation for different values for k. Visualise results, showing model generalisability as a function of model complexity. Describe how a “region” of overfitting and underfitting can be determined in your visualisation. Write (some of your) code into a function that takes k as an input and and returns the MAE determined on the test set.
+
+
+Is there an “optimal” k in terms of model generalisability? Edit your code to determine an optimal k.
+    
+    
+  
+```{r}
+
+# I don't have to split the data again because it is already splitted from the first part of the exxercise. 
+
+
+# to get models with different k values and in a second step get the MAE values for the test data for each different model --> finally I want to see the developement of the MAE values.
+
+
+
+# this part should be replaced with a function (see function get_k_models)
+k_models <- list()  
+for (i in 1:40){
+  k_models[[i]] <- caret::train(
+  pp, 
+  data = daily_fluxes_train |> drop_na(), 
+  method = "knn",
+  trControl = caret::trainControl(method = "none"),
+  tuneGrid = data.frame(k = i),
+  metric = "MAE")
+}
+
+
+get_k_models(daily_fluxes_train, 10) ## Why does this function not work?
+
+
+
+mae_test <- list()
+for (i in 1:length(k_models)){
+mae_test[[i]] <- eval_model2(mod = k_models[[i]], df_train = daily_fluxes_train, df_test = daily_fluxes_test)} 
+
+
+
+
+mae_train <- list()
+for (i in 1:length(k_models)){
+mae_train[[i]] <- eval_model3(mod = k_models[[i]], df_train = daily_fluxes_train, df_test = daily_fluxes_test)} 
+
+
+
+# Combine into data frame
+df <- data.frame(cbind(mae_test, mae_train))
+
+
+# add column that numbers the lines
+df <- df %>% 
+  mutate(row_number = row_number())
+
+
+
+
+plot(df$row_number, df$mae_test)
+
+plot(df$row_number, df$mae_train)
+
+
+
+
+# Create scatter plot with two y values - DOESNE'T WORK!! 
+ggplot(data=df, aes(x = row_number) +
+  geom_point(aes(y = mae_test), color = "blue") +
+  geom_point(aes(y = mae_train), color = "red") +
+  xlab("number of k") +
+  ylab("mae values"))
+
+
+
+# Here I get the same error!!! Whyyy?!
+ggplot(data=df, aes(x = row_number, y = mae_test)) +
+  geom_point(color = "red") + geom_point(data = df, aes(x = row_number, y = mae_train), color = "blue")
+
+
+
+
+# Die Idee hier ist jetzt, dass wir die Modelle, die wir in k_models gespeichert haben (sie wurden ja f?r den trainings-Datensatz erstellt) nun auf den Test-Datensatz angewendet werden. Dann wollen wir die MAE Werte rausgeben. Und diese dann mit den MAE-Werte f?r den Trainingsdatensatz vergleichen. Diese nnebeneinander in ein Dataframe packen. Und dass dann plotten. So sollte mann auch sehen, f?r welches k der MAE f?r die Test-Daten am kleinsten ist. DAs ist dann der optimale k Wert. 
+
+
+```
+
+
+
+
+

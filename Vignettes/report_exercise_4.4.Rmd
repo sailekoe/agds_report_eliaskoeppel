@@ -1,0 +1,140 @@
+---
+title: "report_exercise_4.4"
+author: "Elias Köppel"
+date: "2023-03-13"
+output: html_document
+---
+
+In this report exercise, I'm going to discuss the pre-installed dataset "airquality", which contains the ozone concentration, wind speed and temperature between mai and october 1973 in New York. Since ozone concentration is considered a measure of air quality, I will focus primarily on this variable and examine its relationship with the other variables. 
+
+Ozone (O3) is an air pollutant that is not directly emitted into the air, but instead it is formed through chemical reactions in the atmosphere when ultraviolet (UV) radiation from the sun interacts with nitrogen oxides (NOx = NO2 + NO) and volatile organic compounds (VOCs) (https://airquality.gsfc.nasa.gov/surface-level-ozone). Consequently, I expect that the ozone concentration increases with high temperatures. Given the fact that the ozone formation requires nitrogen oxides, which are  released to the atmosphere through human actions (which mainly happen in the city), I expect that a high wind speed leads to an decrease of the ozone concentration because the air is being exchanged.  
+
+In the first step, I'm going to show three different graphs, which illustrate the relation between the two variables, temperature and wind, and the ozone concentration in the air. Further, I'm going to discuss some statistical metrics. 
+
+
+
+
+In this first chunk, I'm just making the data ready for use:
+```{r}
+library(dplyr)
+library(lubridate) #for converting the dates into month names
+
+#load pre-installed dataset "airquality"
+
+data_airquality <- datasets::airquality
+
+
+
+#add column with the date of the measurement to create a well comprehensible timeline in the following plots
+
+data_airquality <- data_airquality |> 
+  mutate(date = seq(as.Date("1973/05/01"), as.Date("1973/09/30"), 1))
+
+
+
+
+
+
+
+
+# extract the month names from the dates
+data_airquality$month <- month(data_airquality$date, label = TRUE)
+
+
+```
+
+
+
+
+
+
+
+This first plot shows the development of the ozone concentration between mai and october 1973. Also, the coloured dots show the temperature. Already in this graph, a link between high ozone concentration and hight temperature can be observed. 
+```{r}
+library(ggplot2)
+
+ggplot(
+    data = data_airquality,
+    aes(x = date, y = Ozone)) +
+  geom_line() +
+  geom_point(aes(color = Temp), size = 1.7) + ggtitle("ozone concentration in 1973") +
+  labs(x = "Time", 
+       y = "ozone concentration [ppb]") +
+  scale_color_viridis_c(direction = 1) + # inverse color scale is more intuitive here
+  theme_classic()
+
+```
+
+
+
+
+
+This second graph shows ozone concentration and temperature and a very clear correlation between these two variables. Also, it includes linear regressions for the different months. What is interesting to see is that the slope of the straights of the two warmest months July and August are the steepest. So it seems as if the relation between ozone concentration and temperature is non-linear. 
+```{r}
+
+library(dplyr)
+
+
+
+
+
+ggplot(
+  data = data_airquality,
+  aes(x = Temp, y = Ozone, color = month)) +
+  geom_point(alpha = 0.8) +
+  geom_smooth(formula = NULL, method = "lm", se = FALSE) +
+  ggtitle("correlation of ozone concentration and temperature") +
+  labs(x = expression("temperature [degrees F]"), 
+       y = expression("ozone concentration [ppb]") ) +
+  theme_classic() +
+  scico::scale_color_scico_d(palette = "romaO")
+
+
+
+
+
+```
+
+
+
+
+
+For this third graph, I ploted the ozone concentration against the wind speed. A negative correlation between these two parameters is obvious and again illustratet with a linear regreession model. 
+
+```{r}
+library(ggplot2)
+ggplot(
+  data = data_airquality,
+  aes(y = Temp, x = Wind)) +
+  geom_point(alpha = 0.8) +
+  geom_smooth(formula = NULL, method = "lm", se = FALSE) +
+  ggtitle("negative correlation of ozone concentration and wind speed") +
+  labs(x = expression("wind [mph]"), 
+       y = expression("ozone concentration [ppb]") ) +
+  theme_classic() +
+  scico::scale_color_scico_d(palette = "romaO")
+```
+
+
+
+Finally, I want to discuss some statistical metrics and come to a conclusion:
+```{r}
+
+summary(data_airquality$Ozone)
+
+
+ozone_without_na <- na.omit(data_airquality$Ozone)# remove the NA values to calculate the standard deviation
+
+sd(ozone_without_na)
+
+
+
+```
+We can see that the median concentration of ozone in the air is 31.5 ppb and the standard deviation 32.9. These two metrix are helpful to get a feeling for the approximate range of values in the data.
+However, it is still important to consider the extreme values as well, since these may be the ones most detrimental to people's health. If we do that, we see that the maximum value of 168 ppm is more than 5 times higher than the median. To put this in relation with official limit values: The limit value in Switzerland for ozone concentration is about 60 ppb. The mentioned extreme value is therefore about 180% higher.
+
+In addition to the extreme values, it is also important to know on how many days the ozone concentration is critical. In this case the 3rd quartile is a good orientation: with 63.25 ppb it is very close to the mentioned limit value of 60 ppb. This means that in a good quarter of the days (NA value exclueded) between May and October the ozone concentration was above the Swiss limit. 
+
+
+In summary, my assumption about the connection between temperature and increased ozone concentration was confirmed. In addition, it was observed that the measured values were above the Swiss limit value in about a quarter of the days, which may be a problem for the health of the local population. 
+

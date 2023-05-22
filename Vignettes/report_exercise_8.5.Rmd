@@ -1,0 +1,183 @@
+
+
+
+
+
+
+Importing and reducing data
+```{r warning = FALSE}
+library(readr)
+library(ggplot2)
+library(dplyr)
+
+half_hourly_fluxes <- readr::read_csv("C:/Users/elias/OneDrive/Uni/4. Semester/Geo/AGDS I/agds_report_eliaskoeppel/data/report_8_df_for_stepwise_regression.csv")
+
+
+# remove not-useful data (dates and locations)
+half_hourly_fluxes_reduced <- half_hourly_fluxes[3:17]
+
+
+```
+
+
+
+
+
+
+
+In this first chunk I managed to get all bivariate models and their r-squared values in a for-loop. I also managed to get the AIC of the model with the highest r-squared value and to make a plot with this best explanatory variable. 
+
+```{r}
+
+
+# Round 1
+
+models <- list()
+
+r_squared <- numeric()
+
+
+
+for (i in 1:ncol(half_hourly_fluxes_reduced)){
+   if (colnames(half_hourly_fluxes_reduced)[i] != "GPP_NT_VUT_REF") { # it should not take "GPP_NT_VUT_REF as an explainatory variable, because it is the target variable 
+    models[[i]] <- lm(half_hourly_fluxes_reduced$GPP_NT_VUT_REF ~ (half_hourly_fluxes_reduced[[i]])) #getting linear models for each of the explainatory variables 
+    r_squared[i] <- summary(models[[i]])$r.squared #getting the r-squared values of the models and putting them into a list
+    }
+}
+
+var_selected <- which.max(r_squared) # getting the index of the the highest r-squared value for further steps 
+best_model1 <- models[[which.max(r_squared)]] # extracting the model with the highest r-squared value
+AIC_best_model <- extractAIC(best_model1)[2] # getting the AIC of the model with the highests r-squared value
+
+r_max_1 <- r_squared[which.max(r_squared)] # getting the highest r-squared value for visualisation in the end
+
+
+```
+
+
+
+
+
+Visualization of the first best explanatory variable
+
+```{r}
+name_var_selected <- names(half_hourly_fluxes_reduced[var_selected]) # to get the name of the best variable. Then I used this variable name to make the following plot: 
+plot(GPP_NT_VUT_REF ~ PPFD_IN, data = half_hourly_fluxes_reduced, main = "GPP vs. the best explainatory variable PPFD_IN")
+
+
+
+
+
+
+
+```
+
+
+We see in this plot that there is a clear correlation between the target variable GPP_NT_VUT_REF and the explainatory variable PPFD_IN. GPP_NT_VUT_REF is the amount of chemical energy, typically expressed as carbon biomass, that primary producers create in a given length of time (Wikipedia). PPFD_IN is the incoming Photosynthetic photon flux density. So it absolutely makes sense that there seems to be a connection between these two variables, because light is needed for primary production (--> photosynthesis). 
+
+
+
+
+
+
+Next I'm going to discuss briefly some visualizations of statistical metrics:  
+
+```{r}
+plot(best_model1)
+
+```
+
+
+
+
+First Plot: Residuals vs. Fitted: Here we see that linearity seems to hold reasonably well, as the red line is close to the dashed line. We can also note the as we move to the right on the x-axis, the spread of the residuals seems to be increasing. 
+
+Second Plot: Normal Q-Q-Plot: We can see that the data points near the tails don't fall along the straight line. So it seems that the dataset likely does not follow a normal distribution.
+
+Third Plot: Scale-Location: Even though the red line has the tendency to ingrease, it is still a roughly horizontal line. So homoscedasticity (which means that there is no systematic change in the spread of the residuals) is likely satisfied for the regression model.
+
+Fourth Plot: Residuals vs. Fitted values: We see that there are no data points which are canditates for outliers, because there are no points which fall outside of the dashed line of the cook's distance. In fact, there is not even a dashed line visible. This is because there are so many data points: It's almost impossible that a data point exists which has so much influence on our model that it would change the coefficients of the model significantly if we would remove this value. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Even after many hours of trying to implement the further steps of the step forward regression in form of a loop, I did not manage to do it. 
+
+Therefore, I coded two further "rounds" manually, to at least get an impression of how the AIC develops when adding further variables: 
+```{r}
+#Round 2
+
+
+models2 <- list()
+
+r_squared2 <- numeric()
+
+for (i in 1:ncol(half_hourly_fluxes_reduced[-(var_selected)])){ #the variable which has been used for the first model ("best_model") is beeing excluded
+if (colnames(half_hourly_fluxes_reduced)[i] != "GPP_NT_VUT_REF") {
+  models2[[i]] <- lm(half_hourly_fluxes_reduced$GPP_NT_VUT_REF ~ half_hourly_fluxes_reduced[[var_selected]] + half_hourly_fluxes_reduced[[i]]) # here I get all the models with two explainatory variables
+  r_squared2[i] <- summary(models2[[i]])$r.squared} #getting the r-squared values
+} 
+  
+  
+  
+  
+var_selected2 <- which.max(r_squared2) # here I get the index of the variable with the highest r-spared values which I could use for the next step
+
+  
+  
+r_max_2 <- r_squared[which.max(r_squared2)]
+best_model2 <- models2[[which.max(r_squared2)]]
+AIC_best_model2 <- extractAIC(best_model2)[2]
+AIC_best_model2
+
+```
+So we see that through adding another explanatory variable, the AIC was reduced from 29689 to 27096, which is a reduction of ca. 9%. 
+
+
+```{r}
+#Round 3
+
+models3 <- list()
+
+r_squared3 <- numeric()
+
+
+
+for (i in 1:ncol(half_hourly_fluxes_reduced[-(c(var_selected, var_selected2))])){ #the variables which have been used for the previous model ("best_model1") is beeing excluded
+if (colnames(half_hourly_fluxes_reduced)[i] != "GPP_NT_VUT_REF") {
+  models3[[i]] <- lm(half_hourly_fluxes_reduced$GPP_NT_VUT_REF ~ half_hourly_fluxes_reduced[[var_selected]] + half_hourly_fluxes_reduced[[var_selected2]]+ half_hourly_fluxes_reduced[[i]]) # here I get all the models with three explainatory variables
+  r_squared3[i] <- summary(models3[[i]])$r.squared} #getting the r-squared values
+} 
+  
+  
+  
+  
+var_selected3 <- which.max(r_squared3) # here I get the index of the variable with the highest r-spared values which I could use for the next step
+
+  
+  
+r_max_3 <- r_squared[which.max(r_squared3)]
+best_model3 <- models3[[which.max(r_squared3)]]
+AIC_best_model3 <- extractAIC(best_model3)[2]
+AIC_best_model3
+
+
+```
+By adding a third explanatory variable, the AIC was reduced by 6%. This is still a clear reduction, but it is alreacy a smaller 
+
+
+
+Although this is still a clear reduction, it is already somewhat smaller than in the previous step. This may be related to the fact that AIC takes into account the use of more variables. It would be interesting to observe the development of the AIC over further steps of the step forward regression - however, this becomes very confusing without a loop and therefore I end my analysis at this stage. But I assume that the reduction of the AIC decreases in each step - until it finally even increases and then the addition of more variables is stopped. 
+
+
