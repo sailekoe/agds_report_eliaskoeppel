@@ -153,6 +153,19 @@ ggplot(data = df_train_lm, aes(x = TIMESTAMP, y = fitted)) +
 
 
 ```
+```{r}
+ggplot(data = df_train_lm, aes(x = TIMESTAMP, y = fitted)) +
+  geom_point(aes(color = "LM on training set")) +
+  geom_point(data = df_test_lm, aes(x = TIMESTAMP, y = fitted, color = "LM on test set")) +
+  geom_point(data = df_train_knn, aes(x = TIMESTAMP, y = fitted, color = "KNN on training set")) +
+  geom_point(data = df_test_knn, aes(x = TIMESTAMP, y = fitted, color = "KNN on test set")) +
+  geom_point(data = df_train_lm, aes(x = TIMESTAMP, y = GPP_NT_VUT_REF, color = "observed GPP")) +
+  scale_color_manual("Data Type", values = c("LM on training set" = "orange", "LM on test set" = "red", 
+                                "KNN on training set" = "blue", "KNN on test set" = "black", 
+                                "observed GPP" = "green")) +
+  theme_classic()
+```
+
 
   
   
@@ -182,20 +195,10 @@ Is there an “optimal” k in terms of model generalisability? Edit your code t
 
 
 
-# this part should be replaced with a function (see function get_k_models)
-k_models <- list()  
-for (i in 1:40){
-  k_models[[i]] <- caret::train(
-  pp, 
-  data = daily_fluxes_train |> drop_na(), 
-  method = "knn",
-  trControl = caret::trainControl(method = "none"),
-  tuneGrid = data.frame(k = i),
-  metric = "MAE")
-}
 
 
-get_k_models(daily_fluxes_train, 10) ## Why does this function not work?
+## getting 100 models for k[1:100]
+k_models <- get_k_models(daily_fluxes_train, 100) 
 
 
 
@@ -213,7 +216,12 @@ mae_train[[i]] <- eval_model3(mod = k_models[[i]], df_train = daily_fluxes_train
 
 
 # Combine into data frame
-df <- data.frame(cbind(mae_test, mae_train))
+df <- tibble(
+  mae_test = unlist(mae_test),
+  mae_train = unlist(mae_train))
+
+df <- data.frame(cbind(unlist(mae_test), 
+                       unlist(mae_train)))
 
 
 # add column that numbers the lines
@@ -223,30 +231,17 @@ df <- df %>%
 
 
 
-plot(df$row_number, df$mae_test)
-
-plot(df$row_number, df$mae_train)
 
 
-
-
-# Create scatter plot with two y values - DOESNE'T WORK!! 
-ggplot(data=df, aes(x = row_number) +
-  geom_point(aes(y = mae_test), color = "blue") +
-  geom_point(aes(y = mae_train), color = "red") +
+# Create scatter plot with two y values 
+ggplot(data=df, aes(x = row_number)) +
+  geom_point(aes(y = X1), color = "blue") +
+  geom_point(aes(y = X2), color = "red") +
   xlab("number of k") +
-  ylab("mae values"))
+  ylab("mae values") 
 
 
 
-# Here I get the same error!!! Whyyy?!
-ggplot(data=df, aes(x = row_number, y = mae_test)) +
-  geom_point(color = "red") + geom_point(data = df, aes(x = row_number, y = mae_train), color = "blue")
-
-
-
-
-# Die Idee hier ist jetzt, dass wir die Modelle, die wir in k_models gespeichert haben (sie wurden ja f?r den trainings-Datensatz erstellt) nun auf den Test-Datensatz angewendet werden. Dann wollen wir die MAE Werte rausgeben. Und diese dann mit den MAE-Werte f?r den Trainingsdatensatz vergleichen. Diese nnebeneinander in ein Dataframe packen. Und dass dann plotten. So sollte mann auch sehen, f?r welches k der MAE f?r die Test-Daten am kleinsten ist. DAs ist dann der optimale k Wert. 
 
 
 ```
