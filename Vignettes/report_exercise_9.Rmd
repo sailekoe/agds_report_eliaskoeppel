@@ -191,14 +191,9 @@ Is there an “optimal” k in terms of model generalisability? Edit your code t
 # I don't have to split the data again because it is already splitted from the first part of the exxercise. 
 
 
-# to get models with different k values and in a second step get the MAE values for the test data for each different model --> finally I want to see the developement of the MAE values.
 
-
-
-
-
-## getting 100 models for k[1:100]
-k_models <- get_k_models(daily_fluxes_train, 100) 
+## getting 100 models for k[1:100] with the function k_models I created
+k_models <- get_k_models(daily_fluxes_train, 40) 
 
 
 
@@ -215,7 +210,7 @@ mae_train[[i]] <- eval_model3(mod = k_models[[i]], df_train = daily_fluxes_train
 
 
 
-# Combine into data frame
+# Putting the mae values into a data frame
 df <- tibble(
   mae_test = unlist(mae_test),
   mae_train = unlist(mae_train))
@@ -226,26 +221,24 @@ df <- data.frame(cbind(unlist(mae_test),
 
 # add column that numbers the lines
 df <- df %>% 
-  mutate(row_number = row_number())
+  mutate(row_number= row_number())
 
 
 
 
 
-
-# Create scatter plot with two y values 
 ggplot(data=df, aes(x = row_number)) +
-  geom_point(aes(y = X1), color = "blue") +
-  geom_point(aes(y = X2), color = "red") +
+  geom_point(aes(y = X1, color = "X1"), show.legend = TRUE) + 
+  geom_point(aes(y = X2, color = "X2"), show.legend = TRUE) + 
+  scale_color_manual(values = c("X1" = "blue", "X2" = "red"), 
+                     labels = c("MAE values for TEST set", "MAE values for TRAIN set")) +
   xlab("number of k") +
-  ylab("mae values") 
-
-
+  ylab("mae values")
 
 
 
 ```
-
+The optimal k in terms of model generalisability would be at the point where the MAE value for the test set (blue dots) is at its minimum. In this case it is not very obvious. It seems as if the minimal MAE is achieved with k = 20. 
 
 
 
