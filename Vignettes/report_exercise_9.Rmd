@@ -76,7 +76,7 @@ How would you position the KNN and the linear regression model along the spectru
 3.) Visualise temporal variations of observed and modelled GPP for both models, covering all available dates   
     
     
-
+First, I have to get the fitted values for the different models and subsets. Then I'm going to visualise all of them in one plot. 
 
 modelled GPP values with the lm model on the train set
 ```{r}
@@ -139,20 +139,6 @@ df_test_lm$fitted <- predict(lmfit, newdata = df_test_lm) #here a new column for
 ```
 
 
-Visualisation:
-```{r}
-ggplot(data = df_train_lm, aes(x = TIMESTAMP, y = fitted)) +
-  geom_point(color = "orange") +
-  geom_point(data = df_test_lm, aes(x = TIMESTAMP, y = fitted), color = "red" ) +
-  geom_point(data = df_train_knn, aes(x = TIMESTAMP, y = fitted), color = "blue") +
-  geom_point(data = df_test_knn, aes(x = TIMESTAMP, y = fitted), color = "black") +
-  geom_point(data = df_train_lm, aes(x = TIMESTAMP, y = GPP_NT_VUT_REF), color = "green") +
-  theme_classic() +
-   scale_color_manual() 
-
-
-
-```
 ```{r}
 ggplot(data = df_train_lm, aes(x = TIMESTAMP, y = fitted)) +
   geom_point(aes(color = "LM on training set")) +
