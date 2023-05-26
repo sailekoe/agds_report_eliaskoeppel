@@ -21,6 +21,9 @@ Get information about the characteristics of the two sites. What are the differe
 ```{r}
 library(dplyr)
 library(tidyverse)
+library(cowplot)
+library(ggplot2)
+library(recipes)
 source("report_exercise_10_functions.R")
 
 
@@ -80,10 +83,26 @@ mod_cv_davos_train <- caret::train(pp_davos_train,
                        
 
 
-# generic print
-print(mod_)
+
 
 ```
+
+
+
+k-fold cross validation for the laegern_flux_train data:
+```{r}
+set.seed(1982)
+mod_cv_laegern_train <- caret::train(pp_laegern_train, 
+                       data = laegern_flux_train |> drop_na(), 
+                       method = "knn",
+                       trControl = caret::trainControl(method = "cv", number = 10))
+                       
+
+
+
+
+```
+
 
 
 
@@ -94,15 +113,124 @@ To answer second task, read in Chapter the following paragraph:
 
 
 How the cv model of the davos train set performs on the davos test set (within-site)
+
 ```{r}
-eval_model(mod = mod_cv_davos_train, df_train = davos_flux_train, df_test = davos_flux_test)
+plot_1 <- eval_model(mod = mod_cv_davos_train, df_test = davos_flux_test)
+
 ```
 
 
 How the cv model of the davos train set performs on the laegern test set (across-site)
 ```{r}
-eval_model(mod = mod_cv_davos_train, df_train = davos_flux_train, df_test = laegern_flux_test)
+plot_2 <- eval_model(mod = mod_cv_davos_train, df_test = laegern_flux_test)
 
 ```
+
+
+In this plot we see: 
+
+On the left: how the model of the davos train set performs on the davos test set (within-site)
+On the right: how the model of the davos train set performs on the laegern test set (across-site)
+```{r}
+cowplot::plot_grid(plot_1, plot_2) 
+
+```
+How the cv model of the laegern train set performs on the laegern test set (within-site)
+```{r}
+plot_3 <- eval_model(mod = mod_cv_laegern_train, df_test = laegern_flux_test)
+
+```
+
+How the cv model of the laegern train set performs on the davos test set (across-site)
+```{r}
+plot_4 <- eval_model(mod = mod_cv_laegern_train, df_test = davos_flux_test)
+
+```
+
+
+
+
+
+
+
+In this plot we see: 
+
+On the left: how the model of the laegern train set performs on the laegern test set (within-site)
+On the right: how the model of the laegern train set performs on the davos test set (across-site)
+```{r}
+cowplot::plot_grid(plot_3, plot_4) 
+```
+
+
+
+
+pool data and creating subsets, with which I create a single model
+```{r}
+davos_flux_noTimestamp <- davos_flux[2:9] # I create a new data set without the timestamp column, because this one is not part of the laegern_flus data set and I need them to have the same variables for the next row-binding step
+
+data_pooled <- rbind(davos_flux_noTimestamp, laegern_flux)
+
+
+
+
+set.seed(1982) 
+
+
+#getting splits for davos data
+split3 <- rsample::initial_split(davos_flux, prop = 0.8, strata = "VPD_F")
+  
+data_pooled_train <- rsample::training(split3)
+  
+data_pooled_test <- rsample::testing(split3)
+
+
+
+
+
+# pre-processing with the get_pp function I stored in the extra file
+pp_data_pooled_train <- get_pp(davos_flux_train)
+pp_data_pooled_test <- get_pp(davos_flux_test)
+
+
+
+
+#creating model
+set.seed(1982)
+mod_data_pooled_train <- caret::train(pp_data_pooled_train, 
+                       data = data_pooled_train |> drop_na(), 
+                       method = "knn",
+                       trControl = caret::trainControl(method = "cv", number = 10))
+
+
+
+
+```
+
+
+
+
+
+applying the pooled model to the test data sets of both sites
+```{r}
+
+plot_5 <- eval_model(mod = mod_data_pooled_train, df_test = davos_flux_test)
+
+```
+
+
+```{r}
+plot_6 <- eval_model(mod = mod_data_pooled_train, df_test = laegern_flux_test)
+```
+
+
+In this plot we see: 
+
+On the left: how the model of the pooled data set performs on the davos test set
+On the right: how the model of the pooled data set performs on the leagern test set 
+```{r}
+cowplot::plot_grid(plot_5, plot_6) 
+```
+
+
 
 
