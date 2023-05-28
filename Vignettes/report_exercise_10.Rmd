@@ -32,12 +32,12 @@ source("report_exercise_10_functions.R")
 davos_flux <- read_csv("C:/Users/elias/OneDrive/Uni/4. Semester/Geo/AGDS I/agds_report_eliaskoeppel/data/FLX_CH-Dav_FLUXNET2015_FULLSET_DD_1997-2014_1-3.csv")
 
 davos_flux <- get_selection(davos_flux)
+davos_flux <- davos_flux[, -c(1,8)] #getting rid of P_F because I want to pool the davos data with the laegern data later and in the laegern data all the P_F values are NA. Also I get rid of the Timestamp column because in my laegern data set this coumn does not exist...
 
-
-laegern_flux <- read_csv("C:/Users/elias/OneDrive/Uni/4. Semester/Geo/AGDS I/agds_report_eliaskoeppel/data/FLX_CH-Lae_FLUXNET2015_FULLSET_HH_2004-2006.csv")
+laegern_flux <- read_csv("C:/Users/elias/OneDrive/Uni/4. Semester/Geo/AGDS I/agds_report_eliaskoeppel/data/FLX_CH-Lae_FLUXNET2015_FULLSET_DD_2004-2014_1-4.csv")
 
 laegern_flux <- get_selection_laegern(laegern_flux)
-
+laegern_flux <- laegern_flux[,-7] #removing the seventh coulumn because it only consists of NA values
 
 set.seed(1982) 
 
@@ -106,8 +106,7 @@ mod_cv_laegern_train <- caret::train(pp_laegern_train,
 
 
 
-To answer second task, read in Chapter the following paragraph: 
-"To evaluate model generalisability to a new site or catchment (not just a new time step within a single site or catchment), this structure has to be taken into consideration. In this, case, data splits of training and validation or testing subsets are to be separated along blocks, delineated by the similar groups of data points (by sites, or by catchments). That is, training data from a given site (or catchment) should be either in the training set or in the test (or validation) set, but not in both."
+
 
 
 
@@ -127,7 +126,7 @@ plot_2 <- eval_model(mod = mod_cv_davos_train, df_test = laegern_flux_test)
 ```
 
 
-In this plot we see: 
+In the following plot we see: 
 
 On the left: how the model of the davos train set performs on the davos test set (within-site)
 On the right: how the model of the davos train set performs on the laegern test set (across-site)
@@ -153,7 +152,7 @@ plot_4 <- eval_model(mod = mod_cv_laegern_train, df_test = davos_flux_test)
 
 
 
-In this plot we see: 
+In the following plot we see: 
 
 On the left: how the model of the laegern train set performs on the laegern test set (within-site)
 On the right: how the model of the laegern train set performs on the davos test set (across-site)
@@ -164,11 +163,10 @@ cowplot::plot_grid(plot_3, plot_4)
 
 
 
-pool data and creating subsets, with which I create a single model
+pooling data and creating subsets, with which I create a single model
 ```{r}
-davos_flux_noTimestamp <- davos_flux[2:9] # I create a new data set without the timestamp column, because this one is not part of the laegern_flus data set and I need them to have the same variables for the next row-binding step
 
-data_pooled <- rbind(davos_flux_noTimestamp, laegern_flux)
+data_pooled <- rbind(davos_flux, laegern_flux)
 
 
 
@@ -223,7 +221,7 @@ plot_6 <- eval_model(mod = mod_data_pooled_train, df_test = laegern_flux_test)
 ```
 
 
-In this plot we see: 
+In the following plot we see: 
 
 On the left: how the model of the pooled data set performs on the davos test set
 On the right: how the model of the pooled data set performs on the leagern test set 
@@ -233,4 +231,8 @@ cowplot::plot_grid(plot_5, plot_6)
 
 
 
+The metrics I'm going to discuss:
 
+The r-squared value measures how well the predictions made by a model match the actual data values. It is a statistical measure of how close the data points are to the fitted regression line. A higher r-squared value indicates a better fit of the data to the model.
+
+The root mean square error (RMSE) value measures the average distance between the predicted values and the actual values. It is a measure of how well the model has performed in predicting the data, with lower RMSE values indicating better performance.
