@@ -1,9 +1,5 @@
 
 
-
-
-
-
 Importing and reducing data
 ```{r warning = FALSE}
 library(readr)
@@ -94,7 +90,7 @@ First Plot: Residuals vs. Fitted: Here we see that linearity seems to hold reaso
 
 Second Plot: Normal Q-Q-Plot: We can see that the data points near the tails don't fall along the straight line. So it seems that the dataset likely does not follow a normal distribution.
 
-Third Plot: Scale-Location: Even though the red line has the tendency to ingrease, it is still a roughly horizontal line. So homoscedasticity (which means that there is no systematic change in the spread of the residuals) is likely satisfied for the regression model.
+Third Plot: Scale-Location: Even though the red line has the tendency to increase, it is still a roughly horizontal line. So homoscedasticity (which means that there is no systematic change in the spread of the residuals) is likely satisfied for the regression model.
 
 Fourth Plot: Residuals vs. Fitted values: We see that there are no data points which are canditates for outliers, because there are no points which fall outside of the dashed line of the cook's distance. In fact, there is not even a dashed line visible. This is because there are so many data points: It's almost impossible that a data point exists which has so much influence on our model that it would change the coefficients of the model significantly if we would remove this value. 
 
@@ -115,8 +111,11 @@ Fourth Plot: Residuals vs. Fitted values: We see that there are no data points w
 Even after many hours of trying to implement the further steps of the step forward regression in form of a loop, I did not manage to do it. 
 
 Therefore, I coded two further "rounds" manually, to at least get an impression of how the AIC develops when adding further variables: 
+
+
+Round 2:
 ```{r}
-#Round 2
+
 
 
 models2 <- list()
@@ -145,8 +144,9 @@ AIC_best_model2
 So we see that through adding another explanatory variable, the AIC was reduced from 29689 to 27096, which is a reduction of ca. 9%. 
 
 
+
+Round 3:
 ```{r}
-#Round 3
 
 models3 <- list()
 
@@ -174,10 +174,10 @@ AIC_best_model3
 
 
 ```
-By adding a third explanatory variable, the AIC was reduced by 6%. This is still a clear reduction, but it is alreacy a smaller 
+By adding a third explanatory variable, the AIC was reduced by 6%. This is still a clear reduction, but it is already a smaller.
 
 
 
-Although this is still a clear reduction, it is already somewhat smaller than in the previous step. This may be related to the fact that AIC takes into account the use of more variables. It would be interesting to observe the development of the AIC over further steps of the step forward regression - however, this becomes very confusing without a loop and therefore I end my analysis at this stage. But I assume that the reduction of the AIC decreases in each step - until it finally even increases and then the addition of more variables is stopped. 
+Although this is still a clear reduction, it is already somewhat smaller than in the previous step. This may be related to the fact that AIC takes into account the use of more variables. It would be interesting to observe the development of the AIC over further steps of the step forward regression - however, this becomes very confusing without a loop and therefore I end my analysis at this stage. But I assume that the reduction of the AIC decreases in each step - until it finally even increases and then the addition of more variables is being stopped. 
 
 
