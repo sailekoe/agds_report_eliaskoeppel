@@ -69,8 +69,9 @@ Why does the evaluation on the test set indicate a better model performance of t
 How would you position the KNN and the linear regression model along the spectrum of the bias-variance trade-off?
 
 
-    KNN --> small Bias, big variance
-    linear model --> big bias, small variance
+    KNN --> here it depends a lot on the chosen k. If k is small, then we get a small bias and a big variance.             If k is big, however, we get a big bias and small variance. 
+    
+    linear model --> big bias, small variance, because it is so simple and therefore can not adapt to a lot of     nuances. 
     
     
 3.) Visualise temporal variations of observed and modelled GPP for both models, covering all available dates   
@@ -81,7 +82,7 @@ First, I have to get the fitted values for the different models and subsets. The
 modelled GPP values with the lm model on the train set
 ```{r}
 
-#fist I have to get the modelled GPP values (I copied a part of the eval_model function)
+#fist I have to get the modeled GPP values (therefore I copied a part of the eval_model function)
 
 df_train_lm <- daily_fluxes_train |> #creating a new data set, which does not contain the NA values
     drop_na()
@@ -127,7 +128,7 @@ df_test_knn$fitted <- predict(knnfit, newdata = df_test_knn) #here a new column 
 modelled GPP values with the lm model on test set
 ```{r}
 
-#fist I have to get the modelled GPP values (I copied a part of the eval_model function)
+#fist I have to get the modeled GPP values (I copied a part of the eval_model function)
 
 df_test_lm <- daily_fluxes_test |> #creating a new data set, which does not contain the NA values
     drop_na()
@@ -155,7 +156,7 @@ ggplot(data = df_train_lm, aes(x = TIMESTAMP, y = fitted)) +
 
   
   
-exercise: Let’s look at the role of k in a KNN. Answer the following questions:
+exercise: Let's look at the role of k in a KNN. Answer the following questions:
 
 Based on your understanding of KNN (and without running code), state a hypothesis for how the R2
 and the MAE evaluated on the test and on the training set would change for k approaching 1 and for k approaching N (the number of observations in the data). Explain your hypothesis, referring to the bias-variance trade-off.
@@ -165,20 +166,20 @@ and the MAE evaluated on the test and on the training set would change for k app
     If k approaches N: the model has high bias but lower variance. Considering more neighbors should reduce the overfitting to the training data but might result in underfitting if the model is too simple. Therefore, I would expect the R2 on the training set to decrease while the MAE would increase. However, on the test set, I would expect the model to generalize better to new data with lower prediction errors --> the R2  increases and the MAE decreases.
 
 
-Put your hypothesis to the test! Write code that splits the data into a training and a test set and repeats model fitting and evaluation for different values for k. Visualise results, showing model generalisability as a function of model complexity. Describe how a “region” of overfitting and underfitting can be determined in your visualisation. Write (some of your) code into a function that takes k as an input and and returns the MAE determined on the test set.
+Put your hypothesis to the test! Write code that splits the data into a training and a test set and repeats model fitting and evaluation for different values for k. Visualize results, showing model generalisability as a function of model complexity. Describe how a region of overfitting and underfitting can be determined in your visualization. Write (some of your) code into a function that takes k as an input and and returns the MAE determined on the test set.
 
 
-Is there an “optimal” k in terms of model generalisability? Edit your code to determine an optimal k.
+Is there an optimal k in terms of model generalisability? Edit your code to determine an optimal k.
     
     
   
 ```{r}
 
-# I don't have to split the data again because it is already splitted from the first part of the exxercise. 
+# I don't have to split the data again because it is already splited from the first part of the exercise. 
 
 
 
-## getting 100 models for k[1:100] with the function k_models I created
+## getting 40 models for k[1:40] with the function k_models I created
 k_models <- get_k_models(daily_fluxes_train, 40) 
 
 
@@ -212,7 +213,7 @@ df <- df %>%
 
 
 
-
+# plotting the results
 ggplot(data=df, aes(x = row_number)) +
   geom_point(aes(y = X1, color = "X1"), show.legend = TRUE) + 
   geom_point(aes(y = X2, color = "X2"), show.legend = TRUE) + 
