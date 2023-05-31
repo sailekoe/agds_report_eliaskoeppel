@@ -99,7 +99,7 @@ ggplot(
 
 
 
-For this third graph, I ploted the ozone concentration against the wind speed. A negative correlation between these two parameters is obvious and again illustratet with a linear regreession model. 
+For this third graph, I ploted the ozone concentration against the wind speed. A negative correlation between these two parameters is obvious and is again illustrated with a linear regression model. 
 
 ```{r}
 library(ggplot2)
@@ -125,8 +125,9 @@ summary(data_airquality$Ozone)
 
 ozone_without_na <- na.omit(data_airquality$Ozone)# remove the NA values to calculate the standard deviation
 
-sd(ozone_without_na)
 
+# calculating the standard deviation, the median, the maximum and the 3th quantile: 
+data.frame(sd(ozone_without_na),median(ozone_without_na), max(ozone_without_na), quantile(ozone_without_na, 0.75))
 
 
 ```
