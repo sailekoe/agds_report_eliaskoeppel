@@ -58,7 +58,7 @@ Visualization of the first best explanatory variable
 
 ```{r}
 name_var_selected <- names(half_hourly_fluxes_reduced[var_selected]) # to get the name of the best variable. Then I used this variable name to make the following plot: 
-plot(GPP_NT_VUT_REF ~ PPFD_IN, data = half_hourly_fluxes_reduced, main = "GPP vs. the best explainatory variable PPFD_IN")
+plot( PPFD_IN ~ GPP_NT_VUT_REF, data = half_hourly_fluxes_reduced, main = "GPP vs. the best explainatory variable PPFD_IN")
 
 
 
@@ -69,7 +69,7 @@ plot(GPP_NT_VUT_REF ~ PPFD_IN, data = half_hourly_fluxes_reduced, main = "GPP vs
 ```
 
 
-We see in this plot that there is a clear correlation between the target variable GPP_NT_VUT_REF and the explainatory variable PPFD_IN. GPP_NT_VUT_REF is the amount of chemical energy, typically expressed as carbon biomass, that primary producers create in a given length of time (Wikipedia). PPFD_IN is the incoming Photosynthetic photon flux density. So it absolutely makes sense that there seems to be a connection between these two variables, because light is needed for primary production (--> photosynthesis). 
+We see in this plot that there is a clear correlation between the target variable GPP_NT_VUT_REF and the explanatory variable PPFD_IN. GPP_NT_VUT_REF is the amount of chemical energy, typically expressed as carbon biomass, that primary producers create in a given length of time (Wikipedia). PPFD_IN is the incoming Photosynthetic photon flux density. So it absolutely makes sense that there seems to be a connection between these two variables, because light is needed for primary production (--> photosynthesis). 
 
 
 
@@ -93,12 +93,6 @@ Second Plot: Normal Q-Q-Plot: We can see that the data points near the tails don
 Third Plot: Scale-Location: Even though the red line has the tendency to increase, it is still a roughly horizontal line. So homoscedasticity (which means that there is no systematic change in the spread of the residuals) is likely satisfied for the regression model.
 
 Fourth Plot: Residuals vs. Fitted values: We see that there are no data points which are canditates for outliers, because there are no points which fall outside of the dashed line of the cook's distance. In fact, there is not even a dashed line visible. This is because there are so many data points: It's almost impossible that a data point exists which has so much influence on our model that it would change the coefficients of the model significantly if we would remove this value. 
-
-
-
-
-
-
 
 
 
