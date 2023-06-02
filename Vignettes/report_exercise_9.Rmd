@@ -225,8 +225,11 @@ ggplot(data=df, aes(x = row_number)) +
 
 
 ```
-The optimal k in terms of model generalisability would be at the point where the MAE value for the test set (blue dots) is at its minimum. In this case it is not very obvious. It seems as if the minimal MAE is achieved with k = 20. 
+The optimal k in terms of model generalisability would be at the point where the MAE value for the test set (blue dots) is at its minimum: 
+```{r}
+which.min(df[,1])
+```
 
 
-
+In this case the minimal MAE is achieved with k = 19.  
 
