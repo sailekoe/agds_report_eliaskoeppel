@@ -6,7 +6,7 @@ output: html_document
 ---
 
 
-1) Manually clean the data in the tab "Database S1" and save it as a CSV file that can be read into R.
+1) Mmmmanually clean the data in the tab "Database S1" and save it as a CSV file that can be read into R.
 ```{r, warning=FALSE}
 
 #load library
