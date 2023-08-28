@@ -7,7 +7,7 @@ output: html_document
 
 
 1) Manually clean the data in the tab "Database S1" and save it as a CSV file that can be read into R.
-```{r}
+```{r, warning=FALSE}
 
 #load library
 library(tidyverse)
@@ -59,17 +59,17 @@ library(knitr)
 
 
 
-# these values are used to define the different categories 
-values = c(3, 6)
+  # these values are used to define the different categories 
+  values = c(3, 6)
 
 
-categories <- data1 |>
+  categories <- data1 |>
   
-  #create first category (< 3 years)
-  filter(Time..years. < values[1]) |>
-  mutate(phase = "early phase") |> 
-  bind_rows(
-    data1 |>
+    #create first category (< 3 years)
+    filter(Time..years. < values[1]) |>
+    mutate(phase = "early phase") |> 
+   bind_rows(
+      data1 |>
       
       #create second category (> 3 years and < 6 years)
       filter(Time..years. < values[2] & Time..years. > values[1] ) |>
