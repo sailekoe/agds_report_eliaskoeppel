@@ -1,5 +1,5 @@
 ---
-title: "report_exercise_10"
+title: "Report exercise 10"
 author: "Elias Köppel"
 date: "2023-05-20"
 output: html_document
@@ -8,7 +8,7 @@ output: html_document
 
 
 
-```{r}
+```{r, warning=FALSE}
 library(dplyr)
 library(tidyverse)
 library(cowplot)
@@ -19,12 +19,12 @@ source("report_exercise_10_functions.R")
 
 
 
-davos_flux <- read_csv("C:/Users/elias/OneDrive/Uni/4. Semester/Geo/AGDS I/agds_report_eliaskoeppel/data/FLX_CH-Dav_FLUXNET2015_FULLSET_DD_1997-2014_1-3.csv")
+davos_flux <- read_csv("../data/FLX_CH-Dav_FLUXNET2015_FULLSET_DD_1997-2014_1-3.csv")
 
 davos_flux <- get_selection(davos_flux)
 davos_flux <- davos_flux[, -c(1,8)] #getting rid of P_F because I want to pool the davos data with the laegern data later and in the laegern data all the P_F values are NA. Also I get rid of the Timestamp column because in my laegern data set this coumn does not exist...
 
-laegern_flux <- read_csv("C:/Users/elias/OneDrive/Uni/4. Semester/Geo/AGDS I/agds_report_eliaskoeppel/data/FLX_CH-Lae_FLUXNET2015_FULLSET_DD_2004-2014_1-4.csv")
+laegern_flux <- read_csv("../data/FLX_CH-Lae_FLUXNET2015_FULLSET_DD_2004-2014_1-4.csv")
 
 laegern_flux <- get_selection_laegern(laegern_flux)
 laegern_flux <- laegern_flux[,-7] #removing the seventh coulumn because it only consists of NA values
@@ -64,7 +64,7 @@ pp_laegern_teset <- get_pp(laegern_flux_test)
 
 
 k-fold cross validation for the davos_flux_train data:
-```{r}
+```{r, warning=FALSE}
 set.seed(1982)
 mod_cv_davos_train <- caret::train(pp_davos_train, 
                        data = davos_flux_train |> drop_na(), 
@@ -101,15 +101,15 @@ mod_cv_laegern_train <- caret::train(pp_laegern_train,
 
 
 
-How the cv model of the davos train set performs on the davos test set (within-site)
 
-```{r}
+
+```{r, warning=FALSE}
 plot_1 <- eval_model(mod = mod_cv_davos_train, df_test = davos_flux_test)
 
 ```
 
 
-How the cv model of the davos train set performs on the laegern test set (across-site)
+
 ```{r warning = FALSE}
 plot_2 <- eval_model(mod = mod_cv_davos_train, df_test = laegern_flux_test)
 
@@ -118,20 +118,20 @@ plot_2 <- eval_model(mod = mod_cv_davos_train, df_test = laegern_flux_test)
 
 In the following plot we see: 
 
-On the left: how the model of the davos train set performs on the davos test set (within-site)
-On the right: how the model of the davos train set performs on the laegern test set (across-site)
-```{r}
+On the left: how the cv model of the davos train set performs on the davos test set (within-site).
+
+On the right: how the cv model of the davos train set performs on the laegern test set (across-site).
+```{r, warning=FALSE}
 cowplot::plot_grid(plot_1, plot_2) 
 
 ```
-How the cv model of the laegern train set performs on the laegern test set (within-site)
-```{r}
+
+```{r, warning=FALSE}
 plot_3 <- eval_model(mod = mod_cv_laegern_train, df_test = laegern_flux_test)
 
 ```
 
-How the cv model of the laegern train set performs on the davos test set (across-site)
-```{r}
+```{r, warning=FALSE}
 plot_4 <- eval_model(mod = mod_cv_laegern_train, df_test = davos_flux_test)
 
 ```
@@ -144,16 +144,18 @@ plot_4 <- eval_model(mod = mod_cv_laegern_train, df_test = davos_flux_test)
 
 In the following plot we see: 
 
-On the left: how the model of the laegern train set performs on the laegern test set (within-site)
-On the right: how the model of the laegern train set performs on the davos test set (across-site)
-```{r}
+On the left: how the cv model of the laegern train set performs on the laegern test set (within-site).
+
+On the right: how the cv model of the laegern train set performs on the davos test set (across-site).
+```{r, warning=FALSE}
 cowplot::plot_grid(plot_3, plot_4) 
 ```
 
 
 
 
-pooling data and creating subsets, with which I create a single model
+Pooling data and creating subsets, with which I create a single model
+
 ```{r warning = FALSE}
 
 data_pooled <- rbind(davos_flux, laegern_flux)
@@ -199,23 +201,24 @@ mod_data_pooled_train <- caret::train(pp_data_pooled_train,
 
 
 applying the pooled model to the test data sets of both sites
-```{r}
+```{r, warning=FALSE}
 
 plot_5 <- eval_model(mod = mod_data_pooled_train, df_test = davos_flux_test)
 
 ```
 
 
-```{r}
+```{r, warning=FALSE}
 plot_6 <- eval_model(mod = mod_data_pooled_train, df_test = laegern_flux_test)
 ```
 
 
 In the following plot we see: 
 
-On the left: how the model of the pooled data set performs on the davos test set
-On the right: how the model of the pooled data set performs on the leagern test set 
-```{r}
+On the left: how the model of the pooled data set performs on the davos test set.
+
+On the right: how the model of the pooled data set performs on the leagern test set.
+```{r, warning=FALSE}
 cowplot::plot_grid(plot_5, plot_6) 
 ```
 
@@ -259,4 +262,4 @@ Differences:
   
 Biases of the out-of-sample predictions:
 
-If I compare the across-site predictions, I can observe that the Laegern model returns higher values that the Davos model. This might be the case because the Laegern model was trained with higher GPP values than the Davos model, due to the different biological conditions in the different sites (as shown above)
+If I compare the across-site predictions, I can observe that the Laegern model returns higher values that the Davos model. This might be the case because the Laegern model was trained with higher GPP values than the Davos model, due to the different biological conditions in the different sites (as shown above).

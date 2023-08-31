@@ -1,4 +1,12 @@
 
+---
+title: "Report exercise 8.5"
+author: "Elias Köppel"
+date: "2023-03-13"
+output: html_document
+---
+
+
 
 Importing and reducing data
 ```{r warning = FALSE}
@@ -6,7 +14,7 @@ library(readr)
 library(ggplot2)
 library(dplyr)
 
-half_hourly_fluxes <- readr::read_csv("C:/Users/elias/OneDrive/Uni/4. Semester/Geo/AGDS I/agds_report_eliaskoeppel/data/report_8_df_for_stepwise_regression.csv")
+half_hourly_fluxes <- readr::read_csv("../data/report_8_df_for_stepwise_regression.csv")
 
 
 # remove not-useful data (dates and locations)
@@ -23,7 +31,7 @@ half_hourly_fluxes_reduced <- half_hourly_fluxes[3:17]
 
 In this first chunk I managed to get all bivariate models and their r-squared values in a for-loop. I also managed to get the AIC of the model with the highest r-squared value and to make a plot with this best explanatory variable. 
 
-```{r}
+```{r, warning=FALSE}
 
 
 # Round 1
@@ -56,7 +64,7 @@ r_max_1 <- r_squared[which.max(r_squared)] # getting the highest r-squared value
 
 Visualization of the first best explanatory variable
 
-```{r}
+```{r, warning=FALSE}
 name_var_selected <- names(half_hourly_fluxes_reduced[var_selected]) # to get the name of the best variable. Then I used this variable name to make the following plot: 
 plot( PPFD_IN ~ GPP_NT_VUT_REF, data = half_hourly_fluxes_reduced, main = "GPP vs. the best explainatory variable PPFD_IN")
 
@@ -78,7 +86,7 @@ We see in this plot that there is a clear correlation between the target variabl
 
 Next I'm going to discuss briefly some visualizations of statistical metrics:  
 
-```{r}
+```{r, warning=FALSE}
 plot(best_model1)
 
 ```
@@ -108,7 +116,7 @@ Therefore, I coded two further "rounds" manually, to at least get an impression 
 
 
 Round 2:
-```{r}
+```{r, warning=FALSE}
 
 
 
@@ -140,7 +148,7 @@ So we see that through adding another explanatory variable, the AIC was reduced 
 
 
 Round 3:
-```{r}
+```{r, warning=FALSE}
 
 models3 <- list()
 
@@ -168,10 +176,6 @@ AIC_best_model3
 
 
 ```
-By adding a third explanatory variable, the AIC was reduced by 6%. This is still a clear reduction, but it is already a smaller.
-
-
-
-Although this is still a clear reduction, it is already somewhat smaller than in the previous step. This may be related to the fact that AIC takes into account the use of more variables. It would be interesting to observe the development of the AIC over further steps of the step forward regression - however, this becomes very confusing without a loop and therefore I end my analysis at this stage. But I assume that the reduction of the AIC decreases in each step - until it finally even increases and then the addition of more variables is being stopped. 
+By adding a third explanatory variable, the AIC was reduced by 6%. Although this is still a clear reduction, it is already somewhat smaller than in the previous step. This may be related to the fact that AIC takes into account the use of more variables. It would be interesting to observe the development of the AIC over further steps of the step forward regression - however, this becomes very confusing without a loop and therefore I end my analysis at this stage. But I assume that the reduction of the AIC decreases in each step - until it finally even increases and then the addition of more variables is being stopped. 
 
 

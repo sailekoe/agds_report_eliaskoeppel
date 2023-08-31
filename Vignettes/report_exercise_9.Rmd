@@ -1,5 +1,5 @@
 ---
-title: "report_exercise_9"
+title: "Report exercise 9"
 author: "Elias Köppel"
 date: "2023-05-04"
 output:
@@ -7,8 +7,8 @@ output:
     toc: true
 ---
 
-```{r}
-source("report_exercise_9_functions.R") # to access the functions I saved in a separate file called "report_exercise_9_functions"
+```{r, warning=FALSE}
+source("report_exercise_9_functions.R") # accessing the functions I saved in a separate file called "report_exercise_9_functions"
 
 
 library(ggplot2)
@@ -21,7 +21,7 @@ library(class)
 library(readr)
 library(lubridate)
 library(tidyr)
-daily_fluxes <- read_csv("C:/Users/elias/OneDrive/Uni/4. Semester/Geo/AGDS I/agds_report_eliaskoeppel/data/FLX_CH-Dav_FLUXNET2015_FULLSET_DD_1997-2014_1-3.csv") 
+daily_fluxes <- read_csv("../data/FLX_CH-Dav_FLUXNET2015_FULLSET_DD_1997-2014_1-3.csv") 
 
 daily_fluxes <- get_selection(daily_fluxes)
 
@@ -43,14 +43,14 @@ daily_fluxes <- get_selection(daily_fluxes)
   knnfit <- get_knn(data = daily_fluxes, pp = pp)
 ```
 
-```{r}
+```{r, warning=FALSE}
   # getting the evaluation of the regression model 
   eval_model(mod = lmfit, df_train = daily_fluxes_train, df_test = daily_fluxes_test)
 
 
 ```
 
-```{r}
+```{r, warning=FALSE}
  # getting the evaluation of the knn model 
 eval_model(mod = knnfit, df_train = daily_fluxes_train, df_test = daily_fluxes_test)
 ```
@@ -80,7 +80,7 @@ How would you position the KNN and the linear regression model along the spectru
 First, I have to get the fitted values for the different models and subsets. Then I'm going to visualise all of them in one plot. 
 
 modelled GPP values with the lm model on the train set
-```{r}
+```{r, warning=FALSE}
 
 #fist I have to get the modeled GPP values (therefore I copied a part of the eval_model function)
 
@@ -97,7 +97,7 @@ df_train_lm$fitted <- predict(lmfit, newdata = df_train_lm) #here a new column f
   
   
 modelled GPP values with the KNN model on the train set
-```{r}
+```{r, warning=FALSE}
 
 #fist I have to get the modelled GPP values (I copied a part of the eval_model function)
 
@@ -112,7 +112,7 @@ df_train_knn$fitted <- predict(knnfit, newdata = df_train_knn) #here a new colum
 ```
 
 modelled GPP values with the KNN model on test set
-```{r}
+```{r, warning=FALSE}
 
 #fist I have to get the modelled GPP values (I copied a part of the eval_model function)
 
@@ -126,7 +126,7 @@ df_test_knn$fitted <- predict(knnfit, newdata = df_test_knn) #here a new column 
 ```
 
 modelled GPP values with the lm model on test set
-```{r}
+```{r, warning=FALSE}
 
 #fist I have to get the modeled GPP values (I copied a part of the eval_model function)
 
@@ -140,7 +140,7 @@ df_test_lm$fitted <- predict(lmfit, newdata = df_test_lm) #here a new column for
 ```
 
 
-```{r}
+```{r, warning=FALSE}
 ggplot(data = df_train_lm, aes(x = TIMESTAMP, y = fitted)) +
   geom_point(aes(color = "LM on training set")) +
   geom_point(data = df_test_lm, aes(x = TIMESTAMP, y = fitted, color = "LM on test set")) +
@@ -173,7 +173,7 @@ Is there an optimal k in terms of model generalisability? Edit your code to dete
     
     
   
-```{r}
+```{r, warning=FALSE}
 
 # I don't have to split the data again because it is already splited from the first part of the exercise. 
 
@@ -225,8 +225,11 @@ ggplot(data=df, aes(x = row_number)) +
 
 
 ```
+
+
 The optimal k in terms of model generalisability would be at the point where the MAE value for the test set (blue dots) is at its minimum: 
-```{r}
+
+```{r, warning=FALSE}
 which.min(df[,1])
 ```
 

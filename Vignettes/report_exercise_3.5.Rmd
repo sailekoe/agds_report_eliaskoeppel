@@ -6,14 +6,14 @@ output: html_document
 ---
 
 
-1) Mmmmanually clean the data in the tab "Database S1" and save it as a CSV file that can be read into R.
+1) Manually clean the data in the tab "Database S1" and save it as a CSV file that can be read into R.
 ```{r, warning=FALSE}
 
 #load library
 library(tidyverse)
 
 #read in the data, which has been cleaned before manually by deleting data which is not of interest
-data1 <- read.csv("C:/Users/elias/OneDrive/Uni/4. Semester/Geo/AGDS I/agds_report_eliaskoeppel/data/data_report_exercise_3.5.csv", header=TRUE, stringsAsFactors=FALSE, sep = ";")
+data1 <- read.csv("../data/data_report_exercise_3.5.csv", header=TRUE, stringsAsFactors=FALSE, sep = ";")
 
 #remove the NA values from the data
 data1 <- na.omit(data1) 

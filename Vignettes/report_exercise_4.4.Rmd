@@ -1,5 +1,5 @@
 ---
-title: "report_exercise_4.4"
+title: "Report exercise 4.4"
 author: "Elias Köppel"
 date: "2023-03-13"
 output: html_document
@@ -15,7 +15,7 @@ In the first step, I'm going to show three different graphs, which illustrate th
 
 
 In this first chunk, I'm just making the data ready for use:
-```{r}
+```{r, warning=FALSE}
 library(dplyr)
 library(lubridate) #for converting the dates into month names
 
@@ -50,7 +50,7 @@ data_airquality$month <- month(data_airquality$date, label = TRUE)
 
 
 This first plot shows the development of the ozone concentration between mai and october 1973. Also, the coloured dots show the temperature. Already in this graph, a link between high ozone concentration and hight temperature can be observed. 
-```{r}
+```{r, warning=FALSE}
 library(ggplot2)
 
 ggplot(
@@ -70,7 +70,7 @@ ggplot(
 
 
 This second graph shows ozone concentration and temperature and a very clear correlation between these two variables. Also, it includes linear regressions for the different months. What is interesting to see is that the slope of the straights of the two warmest months July and August are the steepest. So it seems as if the relation between ozone concentration and temperature is non-linear. 
-```{r}
+```{r, warning=FALSE}
 
 library(dplyr)
 
@@ -101,7 +101,7 @@ ggplot(
 
 For this third graph, I ploted the ozone concentration against the wind speed. A negative correlation between these two parameters is obvious and is again illustrated with a linear regression model. 
 
-```{r}
+```{r, warning=FALSE}
 library(ggplot2)
 ggplot(
   data = data_airquality,
@@ -118,7 +118,7 @@ ggplot(
 
 
 Finally, I want to discuss some statistical metrics and come to a conclusion:
-```{r}
+```{r, warning=FALSE}
 
 summary(data_airquality$Ozone)
 
