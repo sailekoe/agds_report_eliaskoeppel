@@ -97,4 +97,4 @@ kable(lrr_categories)
 
 ```
 
-
+> Feedback: Here you could have included a written interpretation of the results of your data crunching. Thinking critically about the results of an analysis and checking if the numbers make sense is always important. 
